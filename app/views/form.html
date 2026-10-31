@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}ACORD {{ key }} · {{ case.name }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block body %}
+<a class="back" href="/cases/{{ case.id }}?tab=forms">{{ case.name }}</a>
+<div class="pagehead">
+  <div>
+    <h1 class="display">{{ title.split(' - ', 1)[0] }} <span class="display-sub">{{ title.split(' - ', 1)[-1] }}</span></h1>
+    <p class="muted" id="counts"></p>
+  </div>
+  <div class="actions">
+    <button class="btn ghost" id="verify">Check PDF</button>
+    <a class="btn ghost" href="/cases/{{ case.id }}/forms/{{ key }}/pdf?flatten=1">Download read-only</a>
+    <a class="btn" href="/cases/{{ case.id }}/forms/{{ key }}/pdf">Download fillable PDF</a>
+  </div>
+</div>
+<p class="saved" id="msg" role="status" aria-live="polite"></p>
+<div class="formlayout">
+  <aside class="formside">
+    <div class="legend">
+      <p><span class="sw ok"></span>Goes into the PDF</p>
+      <p><span class="sw hl"></span>Waiting for review, left out of the PDF</p>
+      <p><span class="sw agent"></span>For the agency to fill</p>
+    </div>
+    <p class="phone-tip">On a phone, the form is small. Editing is easier in the <a href="/cases/{{ case.id }}?tab=facts">Facts tab</a>, and changes appear here.</p>
+    <h2>To review on this form</h2>
+    <ul id="pending" class="pending"></ul>
+    <p class="muted small">Changes save as you type and update every form for this client.</p>
+  </aside>
+  <div class="pages" id="pages"></div>
+</div>
+<script id="data" type="application/json">{{ data|tojson }}</script>
+<script>window.CASE_ID = {{ case.id }}; window.FORM_KEY = "{{ key }}";</script>
+{% endblock %}
+{% block scripts %}<script src="/static/vendor/pdfjs/pdf.min.js?v=3.11.174"></script>
+<script src="/static/form.js?v={{ v }}"></script>{% endblock %}

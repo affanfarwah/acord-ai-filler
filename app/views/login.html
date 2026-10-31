@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block body %}
+<div class="auth">
+  <div class="auth-intro">
+    <p class="eyebrow">For commercial insurance agencies</p>
+    <h1 class="display">Client documents in.<br><span class="hl-display">Checked</span> ACORD forms out.</h1>
+    <p class="lede">ACORD AI Filler reads the questionnaire, policies and prior applications once, fills every form you need, and shows the source of every answer.</p>
+    <ul class="ticks">
+      <li>ACORD 125, 126, 127, 130, 131, 137 and 140</li>
+      <li>Excel questionnaires, PDFs, emails and screenshots</li>
+      <li>Nothing unchecked goes into a PDF</li>
+    </ul>
+  </div>
+  <div class="auth-forms">
+    <section class="sheet">
+      <h2>Sign in</h2>
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+      <form method="post" action="/login">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <label>Email<input type="email" name="email" required autocomplete="username"></label>
+        <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
+        <button class="btn">Sign in</button>
+      </form>
+    </section>
+    <details class="sheet">
+      <summary><h2>Create an account</h2></summary>
+      <form method="post" action="/register">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <label>Your name<input name="name" required autocomplete="name"></label>
+        <label>Email<input type="email" name="email" required autocomplete="email"></label>
+        <label>Password<input type="password" name="password" minlength="8" required autocomplete="new-password"><small>At least 8 characters</small></label>
+        <label>Agency name<input name="agency"><small>Starting a new agency account</small></label>
+        <label>Invite code<input name="invite"><small>Joining an agency that already uses ACORD AI Filler</small></label>
+        <button class="btn">Create account</button>
+      </form>
+    </details>
+  </div>
+</div>
+{% endblock %}

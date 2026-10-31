@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}New client{% endblock %}
+{% block body %}
+<a class="back" href="/">Clients</a>
+<h1 class="display">New client</h1>
+{% if not has_producer %}<p class="notice">Your agency details aren't set, so the producer section of each form will be blank. <a href="/settings">Add them in Agency settings</a>.</p>{% endif %}
+<form id="newcase" class="newcase">
+  <section class="sheet">
+    <h2>Client</h2>
+    <label>Business name<input name="name" required><small>The business applying for coverage. Used to name the client and their PDFs.</small></label>
+  </section>
+
+  <section class="sheet">
+    <h2>Documents</h2>
+    <label class="drop" id="drop">
+      <input type="file" name="files" id="files" multiple accept=".pdf,.xlsx,.xlsm,.png,.jpg,.jpeg,.txt,.csv,.md,.eml">
+      <span class="drop-title">Drop files here, or choose files</span>
+      <span class="muted">Excel questionnaires, policies, declarations pages, prior ACORD forms, emails or screenshots. Up to 25 MB each.</span>
+    </label>
+    <ul class="filelist" id="filelist"></ul>
+  </section>
+
+  <section class="sheet picker" id="picker">
+    <h2>What are you quoting?</h2>
+    <p class="muted small">Pick the coverage. We'll choose the ACORD forms for you.</p>
+    <div class="lines" role="group" aria-label="Coverage lines">
+      {% for code, label in [('auto','Commercial auto'),('gl','General liability'),('property','Property'),('wc','Workers comp'),('umbrella','Umbrella / excess')] %}
+      <button type="button" class="line" data-line="{{ code }}" aria-pressed="{{ 'true' if code == 'auto' else 'false' }}">{{ label }}</button>
+      {% endfor %}
+    </div>
+    {% if states|length > 1 %}
+    <label class="state-pick">State <span class="muted small">for state-specific forms</span>
+      <select id="state">{% for st in states %}<option value="{{ st[0] }}" {% if st[0] == 'TX' %}selected{% endif %}>{{ st[1] }}</option>{% endfor %}</select>
+    </label>
+    {% else %}<input type="hidden" id="state" value="{{ states[0][0] if states else 'TX' }}">{% endif %}
+    <h3 class="chosen-head">Forms we'll fill <span class="muted small" id="chosen-count"></span></h3>
+    <ul class="chosen" id="chosen" aria-live="polite"></ul>
+    <details class="allforms" id="allforms">
+      <summary>Add another form</summary>
+      <input type="search" id="formsearch" placeholder="Search by number or name, e.g. 163 or driver" aria-label="Search forms">
+      {% for cat in categories %}
+      {% set items = library | selectattr('category', 'equalto', cat) | list %}
+      {% if items %}
+      <fieldset data-cat>
+        <legend>{{ cat }}</legend>
+        {% for f in items %}
+        <label class="formrow" data-search="{{ (f.number ~ ' ' ~ (f.state or '') ~ ' ' ~ f.name ~ ' ' ~ f.title) | lower }}">
+          <input type="checkbox" name="forms" value="{{ f.key }}" data-number="{{ f.number }}" data-state="{{ f.state or '' }}" data-label="ACORD {{ f.number }}{{ ' ' ~ f.state if f.state else '' }}" data-name="{{ f.name }}">
+          <span class="formrow-no">{{ f.number or '—' }}{% if f.state %} <small>{{ f.state }}</small>{% endif %}</span>
+          <span class="formrow-name">{{ f.name }}{% if f.edition %} <span class="muted small">· {{ f.edition }}</span>{% endif %}</span>
+        </label>
+        {% endfor %}
+      </fieldset>
+      {% endif %}
+      {% endfor %}
+    </details>
+  </section>
+
+  <section class="sheet">
+    <h2>Instructions <span class="muted small">optional</span></h2>
+    <label class="sr" for="instructions">Instructions for reading the documents</label>
+    <textarea id="instructions" name="instructions" rows="3" placeholder="e.g. The Allstate PDFs belong to the owner personally; don't use them for the business."></textarea>
+  </section>
+
+  <div class="submitbar">
+    <button class="btn" id="create">Add client and read documents</button>
+    <p id="status" class="muted" role="status"></p>
+  </div>
+</form>
+{% endblock %}

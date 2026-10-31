@@ -1,0 +1,10 @@
+.venv/
+out/
+__pycache__/
+*.db
+.env
+.pytest_cache/
+.DS_Store
+*.pyc
+# old internal notes with real client names
+PLAN.md

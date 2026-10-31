@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}{{ case.name }}{% endblock %}
+{% block body %}
+<a class="back" href="/">Clients</a>
+<div class="pagehead">
+  <div>
+    <h1 class="display">{{ case.name }}</h1>
+    <p class="muted">{{ stats.filled }} facts across {{ forms|length }} form{{ '' if forms|length == 1 else 's' }}{% if stats.pending %} · <span class="hl">{{ stats.pending }} to review</span>{% endif %}</p>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/cases/{{ case.id }}/package?mode=zip">Download forms (ZIP)</a>
+    <a class="btn ghost" href="/cases/{{ case.id }}/package?mode=pdf">One combined PDF</a>
+    <details class="menu">
+      <summary class="btn ghost" aria-label="More actions">More</summary>
+      <div class="menu-pop">
+        <form method="post" action="/cases/{{ case.id }}/rename" class="rename">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <label class="lbl">Rename client<input name="name" value="{{ case.name }}" required></label>
+          <button class="btn small">Save name</button>
+        </form>
+        <form method="post" action="/cases/{{ case.id }}/duplicate"><input type="hidden" name="csrf" value="{{ csrf }}"><button>Duplicate client</button></form>
+        <form method="post" action="/cases/{{ case.id }}/archive"><input type="hidden" name="csrf" value="{{ csrf }}"><button>{{ 'Unarchive' if case.archived else 'Archive' }}</button></form>
+        <form method="post" action="/cases/{{ case.id }}/delete" data-confirm="Delete this client, their answers and uploaded files? This can't be undone."><input type="hidden" name="csrf" value="{{ csrf }}"><button class="danger">Delete client</button></form>
+      </div>
+    </details>
+  </div>
+</div>
+
+<div id="job" class="job" data-case="{{ case.id }}" data-status="{{ job.status if job else 'none' }}" {% if not job or job.status == 'done' %}hidden{% endif %}>
+  {% if job and job.status == 'failed' %}<p class="bad">{{ job.message }}</p>
+  {% else %}<p><span class="pulse">Reading documents</span> <span id="job-n"></span></p><div class="meter"><span id="job-bar"></span></div>{% endif %}
+</div>
+
+<nav class="folder-tabs" aria-label="Client sections">
+  <a href="?tab=forms" {% if tab == 'forms' %}aria-current="page"{% endif %}>Forms <span class="count">{{ forms|length }}</span></a>
+  <a href="?tab=facts" {% if tab == 'facts' %}aria-current="page"{% endif %}>Facts{% if stats.pending %} <span class="count hl">{{ stats.pending }}</span>{% endif %}</a>
+  <a href="?tab=sources" {% if tab == 'sources' %}aria-current="page"{% endif %}>Documents <span class="count">{{ docs|length }}</span></a>
+  <a href="?tab=missing" {% if tab == 'missing' %}aria-current="page"{% endif %}>Missing info</a>
+</nav>
+
+<section class="folder">
+{% if tab == 'facts' %}
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Which facts">
+      <a href="?tab=facts&show=review" {% if show == 'review' %}aria-current="true"{% endif %}>To review</a>
+      <a href="?tab=facts&show=all" {% if show == 'all' %}aria-current="true"{% endif %}>All facts</a>
+    </div>
+    <p class="muted small">Only facts marked <span class="chip ok">Matches source</span>, <span class="chip ok">Approved</span> or <span class="chip ok">Entered by you</span> go into the PDFs.</p>
+  </div>
+  {% if groups %}
+    {% for g, items in groups.items() %}
+    <div class="factgroup" data-group>
+      <div class="factgroup-head">
+        <h2>{{ g }}</h2>
+        {% set pend = items|selectattr('status', 'in', ['review','confirm'])|list|length %}
+        {% if pend %}<div class="group-actions"><button class="btn ghost small" data-group-action="reject">Remove all {{ pend }}</button><button class="btn ghost small" data-group-action="approve">Approve all {{ pend }}</button></div>{% endif %}
+      </div>
+      <table class="facts">
+        <thead><tr><th scope="col">Field</th><th scope="col">Value</th><th scope="col">Source</th><th scope="col">Status</th><th scope="col"><span class="sr">Action</span></th></tr></thead>
+        <tbody>
+        {% for f in items %}
+        <tr data-key="{{ f.key }}" data-status="{{ f.status }}" {% if f.status == 'rejected' %}class="removed"{% endif %}>
+          <th scope="row"><span class="flabel" title="{{ f.help }} · ACORD field {{ f.key }}">{{ f.label }}</span></th>
+          <td>
+            {% if f.type == 'checkbox' %}<input type="checkbox" class="fval" {% if f.value %}checked{% endif %} aria-label="{{ f.label }}">
+            {% elif f.options %}<select class="fval" aria-label="{{ f.label }}"><option value=""></option>{% for o in f.options %}<option {% if o == f.value %}selected{% endif %}>{{ o }}</option>{% endfor %}</select>
+            {% else %}<input class="fval" value="{{ f.value }}" {% if f.maxlen %}maxlength="{{ f.maxlen }}"{% endif %} aria-label="{{ f.label }}">{% endif %}
+          </td>
+          <td class="src" title="{{ f.source }}">
+            {% if f.src.quote %}<span class="src-quote">“{{ f.src.quote }}”</span>{% endif %}
+            {% if f.source in ('Agency settings', 'Entered by agent') or f.source.startswith(("Automatic", "Date the client")) %}<span class="src-where src-plain">{{ 'From Agency settings' if f.source == 'Agency settings' else ('Typed by you' if f.source == 'Entered by agent' else f.source) }}</span>
+            {% elif f.src.where %}
+              {% if f.src.doc_id %}<a class="src-where src-link" href="/cases/{{ case.id }}/docs/{{ f.src.doc_id }}?{% if f.src.row %}sheet={{ f.src.sheet | urlencode }}&row={{ f.src.row }}{% elif f.src.page %}page={{ f.src.page }}{% endif %}" target="_blank" rel="noopener" title="Open {{ f.src.file }}">
+              {% else %}<span class="src-where">{% endif %}<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z M9.5 1.5V5H13"/></svg>{{ f.src.where }}{% if f.src.doc_id %}</a>{% else %}</span>{% endif %}
+            {% else %}—{% endif %}
+          </td>
+          <td><span class="chip {{ 'hl' if f.status in ['review','confirm'] else ('off' if f.status == 'rejected' else 'ok') }}">{{ 'Agency settings' if f.source == 'Agency settings' else ('Automatic' if f.source.startswith(("Automatic", "Date the client")) else status_label[f.status]) }}</span></td>
+          <td class="rowact">{% if f.status in ['review','confirm'] %}<button class="btn small" data-act="approve">Approve</button><button class="linkbtn small" data-act="reject">Remove</button>
+              {% elif f.status == 'rejected' %}<button class="linkbtn small" data-act="approve">Restore</button>{% endif %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  {% elif show == 'review' and stats.filled %}
+    <div class="empty"><p>Nothing to review. Every fact either matches its source or has been approved.</p><a class="btn ghost" href="?tab=facts&show=all">See all {{ stats.filled }} facts</a></div>
+  {% else %}
+    <div class="empty"><p>No facts yet. Add the client's documents and read them, or fill a form by hand.</p><a class="btn ghost" href="?tab=sources">Add documents</a></div>
+  {% endif %}
+
+{% elif tab == 'forms' %}
+  <ul class="formlist">
+  {% for f in forms %}
+    <li class="formtile">
+      <a class="formtile-main" href="/cases/{{ case.id }}/forms/{{ f.key }}">
+        <span class="formcard-no">{{ f.no }}</span>
+        <span><span class="formtile-name">{{ f.title.split(' - ', 1)[-1] }}</span>
+        <span class="muted small">{{ f.ready }} of {{ f.fields }} fields ready{% if f.pending %} · <span class="hl">{{ f.pending }} waiting for review</span>{% endif %} · {{ f.pages }} pages</span></span>
+      </a>
+      <div class="formtile-actions">
+        <a class="btn ghost small" href="/cases/{{ case.id }}/forms/{{ f.key }}">Open</a>
+        <a class="btn ghost small" href="/cases/{{ case.id }}/forms/{{ f.key }}/pdf">Download</a>
+        <form method="post" action="/cases/{{ case.id }}/forms/{{ f.key }}/remove"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="linkbtn small">Remove</button></form>
+      </div>
+    </li>
+  {% endfor %}
+  </ul>
+  {% if library %}
+  <form class="toolbar" method="post" action="/cases/{{ case.id }}/forms">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label class="inline-label">Add a form <select name="template">
+      {% for cat in ['Applications', 'Certificates & evidence', 'Loss notices', 'Policy changes & binders', "Your agency's forms"] %}
+      {% set items = library | selectattr('category', 'equalto', cat) | list %}
+      {% if items %}<optgroup label="{{ cat }}">{% for f in items %}<option value="{{ f.key }}">{{ f.title }}</option>{% endfor %}</optgroup>{% endif %}
+      {% endfor %}</select></label>
+    <button class="btn ghost">Add form</button>
+  </form>
+  <p class="muted small">A new form starts with every answer this client already has. Read the documents again to fill fields only that form asks for.</p>
+  {% endif %}
+
+{% elif tab == 'sources' %}
+  {% if docs %}
+  <ul class="doclist">
+    {% for d in docs %}
+    <li><a class="docname" href="/cases/{{ case.id }}/docs/{{ d.id }}" target="_blank" rel="noopener">{{ d.filename }}</a>
+      <form method="post" action="/cases/{{ case.id }}/docs/{{ d.id }}/delete" data-confirm="Remove {{ d.filename }} from this case? Facts already taken from it stay."><input type="hidden" name="csrf" value="{{ csrf }}"><button class="linkbtn small">Remove</button></form></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <form id="extract" class="extract" data-case="{{ case.id }}">
+    <label class="drop">
+      <input type="file" name="files" multiple accept=".pdf,.xlsx,.xlsm,.png,.jpg,.jpeg,.txt,.csv,.md,.eml">
+      <span class="drop-title">Add more documents</span>
+      <span class="muted">Optional. Then read everything again.</span>
+    </label>
+    <label>Instructions<textarea name="instructions" rows="3">{{ case.instructions }}</textarea><small>Facts you entered or approved are kept. Everything else is read again.</small></label>
+    <button class="btn" {% if not ai_ready %}disabled title="Add an AI key to the .env file"{% endif %}>Read documents</button>
+    <p class="muted" role="status" id="extract-status"></p>
+  </form>
+  {% if case.notes %}
+  <div class="notes"><h2>Notes from the last read</h2><ul>{% for n in case.notes %}<li>{{ n }}</li>{% endfor %}</ul></div>
+  {% endif %}
+
+{% elif tab == 'missing' %}
+  <div id="missing" data-case="{{ case.id }}">
+    <p class="muted">Fields the client needs to answer, from every form for this client. Agency and carrier fields are left out.</p>
+    <button class="btn" id="find-missing">List missing information</button>
+    <div id="missing-list"></div>
+    <div id="email-box" hidden>
+      <h2>Email to the client</h2>
+      <textarea id="email" rows="14"></textarea>
+      <button class="btn ghost" id="copy-email">Copy email</button>
+    </div>
+  </div>
+{% endif %}
+</section>
+{% endblock %}

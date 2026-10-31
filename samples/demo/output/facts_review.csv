@@ -1,0 +1,51 @@
+Section,Field,ACORD field,Value,Source,Status,In PDF,Forms
+Commercial Policy,Operations description,CommercialPolicy_OperationsDescription_A,Non-emergency medical transportation (NEMT) for Medicaid and private-pay riders in Travis County,Questionnaire!C15,Matches source,yes,125
+Driver,Birth date,Driver_BirthDate_A,04/09/1984,Questionnaire!C19,Client to confirm,no - waiting for review,127
+Driver,Experience year count,Driver_ExperienceYearCount_A,14,Questionnaire!C23,Matches source,yes,127
+Driver,Given name,Driver_GivenName_A,Dana,Questionnaire!C18,Matches source,yes,127
+Driver,Hired date,Driver_HiredDate_A,03/15/2019,Questionnaire!C22,Matches source,yes,127
+Driver,License number,Driver_LicenseNumberIdentifier_A,12345678,Questionnaire!C20,Matches source,yes,127
+Driver,Licensed state or province code,Driver_LicensedStateOrProvinceCode_A,TX,Questionnaire!C21,Matches source,yes,127
+Driver,Surname,Driver_Surname_A,Whitfield,Questionnaire!C18,Matches source,yes,127
+Named Insured,Business start date,NamedInsured_BusinessStartDate_A,03/15/2019,Questionnaire!C14,Matches source,yes,125
+Named Insured,Contact primary email address,NamedInsured_Contact_PrimaryEmailAddress_A,office@bluebonnetcare.example,Questionnaire!C10,Matches source,yes,125
+Named Insured,Full name,NamedInsured_FullName_A,Bluebonnet Care Transport LLC,Questionnaire!C6,Matches source,yes,125 127 137
+Named Insured,Legal entity limited liability corporation,NamedInsured_LegalEntity_LimitedLiabilityCorporationIndicator_A,True,Questionnaire!C13,Matches source,yes,125
+Named Insured,Mailing address city name,NamedInsured_MailingAddress_CityName_A,Austin,Questionnaire!C8,Matches source,yes,125
+Named Insured,Mailing address line one,NamedInsured_MailingAddress_LineOne_A,4820 Bluebonnet Ln,Questionnaire!C8,Matches source,yes,125
+Named Insured,Mailing address postal code,NamedInsured_MailingAddress_PostalCode_A,78745,Questionnaire!C8,Matches source,yes,125
+Named Insured,Mailing address state or province code,NamedInsured_MailingAddress_StateOrProvinceCode_A,TX,Questionnaire!C8,Matches source,yes,125
+Named Insured,Primary phone number,NamedInsured_Primary_PhoneNumber_A,(512) 555-0142,Questionnaire!C9,Matches source,yes,125
+Named Insured,Primary website address,NamedInsured_Primary_WebsiteAddress_A,www.bluebonnetcare.example,Questionnaire!C11,Matches source,yes,125
+Named Insured,Tax,NamedInsured_TaxIdentifier_A,12-3456789,Questionnaire!C12,Matches source,yes,125
+Policy,Effective date,Policy_EffectiveDate_A,12/01/2026,Questionnaire!C38,Matches source,yes,125 127 137
+Prior Coverage,Automobile effective date,PriorCoverage_Automobile_EffectiveDate_A,12/01/2025,Questionnaire!C35,Matches source,yes,125
+Prior Coverage,Automobile expiration date,PriorCoverage_Automobile_ExpirationDate_A,12/01/2026,Questionnaire!C36,Matches source,yes,125
+Prior Coverage,Automobile insurer full name,PriorCoverage_Automobile_InsurerFullName_A,Example Mutual Insurance Co,Questionnaire!C33,Matches source,yes,125
+Prior Coverage,Automobile policy number,PriorCoverage_Automobile_PolicyNumberIdentifier_A,EX-4471902,Questionnaire!C34,Matches source,yes,125
+Producer,Contact person email address,Producer_ContactPerson_EmailAddress_A,sam@demoagency.example,Agency settings,Agency settings,yes,125
+Producer,Contact person full name,Producer_ContactPerson_FullName_A,Sam Agent,Agency settings,Agency settings,yes,125
+Producer,Contact person phone number,Producer_ContactPerson_PhoneNumber_A,(713) 555-0100,Agency settings,Agency settings,yes,125
+Producer,Full name,Producer_FullName_A,Demo Insurance Agency,Agency settings,Agency settings,yes,125 127 137
+Producer,Mailing address city name,Producer_MailingAddress_CityName_A,Houston,Agency settings,Agency settings,yes,125
+Producer,Mailing address line one,Producer_MailingAddress_LineOne_A,"100 Example Plaza, Suite 200",Agency settings,Agency settings,yes,125
+Producer,Mailing address postal code,Producer_MailingAddress_PostalCode_A,77002,Agency settings,Agency settings,yes,125
+Producer,Mailing address state or province code,Producer_MailingAddress_StateOrProvinceCode_A,TX,Agency settings,Agency settings,yes,125
+Vehicle,Bodily injury per accident limit amount,Vehicle_BodilyInjury_PerAccidentLimitAmount_A,"500,000",Questionnaire!C39,Matches source,yes,137
+Vehicle,Bodily injury per person limit amount,Vehicle_BodilyInjury_PerPersonLimitAmount_A,"250,000",Questionnaire!C39,Matches source,yes,137
+Vehicle,Collision deductible amount,Vehicle_Collision_DeductibleAmount_A,"1,000",Questionnaire!C44,Matches source,yes,127 137
+Vehicle,Comprehensive deductible amount,Vehicle_Comprehensive_DeductibleAmount_A,500,Questionnaire!C43,Matches source,yes,137
+Vehicle,Cost new amount,Vehicle_CostNewAmount_A,"38,500",Questionnaire!C30,Check source,no - waiting for review,127
+Vehicle,Coverage collision,Vehicle_Coverage_CollisionIndicator_A,True,Questionnaire!C44,Matches source,yes,127 137
+Vehicle,Coverage comprehensive,Vehicle_Coverage_ComprehensiveIndicator_A,True,Questionnaire!C43,Matches source,yes,127
+Vehicle,Coverage comprehensive or specified cause of loss deductible amount,Vehicle_Coverage_ComprehensiveOrSpecifiedCauseOfLossDeductibleAmount_A,500,Questionnaire!C43,Matches source,yes,127
+Vehicle,Manufacturers name,Vehicle_ManufacturersName_A,Toyota,Questionnaire!C26,Matches source,yes,127
+Vehicle,Medical payments per person limit amount,Vehicle_MedicalPayments_PerPersonLimitAmount_A,"5,000",Questionnaire!C42,Client to confirm,no - waiting for review,137
+Vehicle,Model name,Vehicle_ModelName_A,Sienna,Questionnaire!C27,Matches source,yes,127
+Vehicle,Model year,Vehicle_ModelYear_A,2022,Questionnaire!C25,Matches source,yes,127
+Vehicle,Property damage per accident limit amount,Vehicle_PropertyDamage_PerAccidentLimitAmount_A,"100,000",Questionnaire!C40,Matches source,yes,137
+Vehicle,Radius of use,Vehicle_RadiusOfUse_A,100,Questionnaire!C31,Matches source,yes,127
+Vehicle,Seating capacity count,Vehicle_SeatingCapacityCount_A,6,Questionnaire!C30,Matches source,yes,127
+Vehicle,Uninsured underinsured motorists bodily injury per accident limit amount,Vehicle_UninsuredUnderinsuredMotorists_BodilyInjuryPerAccidentLimitAmount_A,"300,000",Questionnaire!C41,Matches source,yes,137
+Vehicle,Uninsured underinsured motorists bodily injury per person limit amount,Vehicle_UninsuredUnderinsuredMotorists_BodilyInjuryPerPersonLimitAmount_A,"100,000",Questionnaire!C41,Matches source,yes,137
+Vehicle,VIN,Vehicle_VINIdentifier_A,DEMO0VIN000000001,Questionnaire!C28,Matches source,yes,127

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Clients{% endblock %} · ACORD AI Filler</title>
+<meta name="description" content="ACORD AI Filler fills ACORD commercial insurance forms from your client's documents, and shows you the source of every answer.">
+<link rel="icon" href="/static/favicon.svg?v={{ v }}" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v={{ v }}">
+<script>try { if (localStorage.getItem("theme") === "dark") document.documentElement.dataset.theme = "dark"; } catch (e) {}</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+{% set path = request.url.path %}
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="/" aria-label="ACORD AI Filler home">{% include "_logo.html" %}<span class="wordmark">ACORD <span class="wordmark-ai">AI</span> Filler</span></a>
+    {% if user %}
+    <div class="agency-chip" title="You're working in {{ agency_name }}'s account">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h.01M15 10h.01M12 10h.01"/></svg>
+      <span class="agency-chip-text"><span class="agency-chip-label">Agency</span><span class="agency-chip-name">{{ agency_name }}</span></span>
+    </div>
+    <nav class="topnav" aria-label="Main">
+      <a href="/" {% if path == '/' or path.startswith('/cases') %}aria-current="page"{% endif %}>Clients</a>
+      <a href="/settings" {% if path.startswith('/settings') %}aria-current="page"{% endif %}>Agency settings</a>
+      <a href="/help" {% if path.startswith('/help') %}aria-current="page"{% endif %}>Help</a>
+    </nav>
+    <div class="top-right">
+      {% if path != '/cases/new' %}<a class="btn small" href="/cases/new">New client</a>{% endif %}
+      <button class="iconbtn" id="theme" type="button" aria-label="Switch to dark mode" title="Switch theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/><g class="i-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></svg>
+      </button>
+      <details class="usermenu">
+        <summary aria-label="Account menu"><span class="avatar">{{ user.name[:1] | upper }}</span></summary>
+        <div class="menu-pop">
+          <p class="menu-who"><strong>{{ user.name }}</strong><span>{{ user.email if auth_on else 'Local development mode' }}</span></p>
+          {% if auth_on %}<form method="post" action="/logout"><input type="hidden" name="csrf" value="{{ csrf }}"><button>Sign out</button></form>{% endif %}
+        </div>
+      </details>
+    </div>
+    {% endif %}
+  </div>
+</header>
+<main id="content" class="{% block mainclass %}{% endblock %}">{% block body %}{% endblock %}</main>
+<footer class="foot">
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <a class="brand" href="/">{% include "_logo.html" %}<span class="wordmark">ACORD <span class="wordmark-ai">AI</span> Filler</span></a>
+      <p>ACORD forms from your client's documents, with the source of every answer.</p>
+    </div>
+    <nav class="foot-links" aria-label="Footer">
+      <div><h3>Product</h3><a href="/">Clients</a><a href="/cases/new">New client</a><a href="/settings">Agency settings</a></div>
+      <div><h3>Support</h3><a href="/help">How it works</a><a href="/help#statuses">What the colours mean</a><a href="/help#forms">Supported forms</a></div>
+    </nav>
+  </div>
+  <div class="foot-legal">
+    <p>© 2026 ACORD AI Filler. ACORD and the ACORD form names are trademarks of ACORD Corporation. ACORD AI Filler is an independent product, not affiliated with or endorsed by ACORD.</p>
+    <p>Always review a form before sending it to a carrier.</p>
+  </div>
+</footer>
+<script>window.CSRF = "{{ csrf }}";</script>
+<script src="/static/app.js?v={{ v }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

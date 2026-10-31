@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="pagehead">
+  <div>
+    <h1 class="display">{{ 'Archived clients' if archived else 'Clients' }}</h1>
+    <p class="muted">Each client has its documents, its forms and one set of answers shared by all of them.</p>
+  </div>
+</div>
+{% if not ai_ready %}<p class="notice">Reading documents is off until an AI key is added to the <code>.env</code> file. You can still add clients and fill forms by hand.</p>{% endif %}
+<form class="toolbar" method="get" role="search">
+  <input name="q" value="{{ q }}" placeholder="Search by applicant" aria-label="Search by applicant">
+  {% if archived %}<input type="hidden" name="archived" value="1">{% endif %}
+  <button class="btn ghost">Search</button>
+  <a class="toolbar-link" href="/?archived={{ 0 if archived else 1 }}">{{ 'Show active clients' if archived else 'Show archived' }}</a>
+</form>
+{% if cases %}
+<ol class="caselist">
+  {% for c in cases %}
+  <li>
+    <a class="case-row" href="/cases/{{ c.id }}">
+      <span class="case-name">{{ c.name }}</span>
+      <span class="case-forms">{% for f in c.forms %}<span class="formno">{{ f }}</span>{% endfor %}</span>
+      <span class="case-progress">
+        {% if c.job == 'running' %}<span class="pulse">Reading documents…</span>
+        {% elif c.job == 'failed' %}<span class="bad">Reading failed</span>
+        {% else %}{{ c.stats.filled }} facts{% if c.stats.pending %} · <span class="hl">{{ c.stats.pending }} to review</span>{% endif %}{% endif %}
+      </span>
+      <span class="case-meta">{{ c.owner }} · {{ c.updated }}</span>
+    </a>
+  </li>
+  {% endfor %}
+</ol>
+{% else %}
+<div class="empty">
+  {% if q %}<p>No clients match “{{ q }}”.</p>
+  {% else %}<p>No clients yet. Add one with their questionnaire and any policies or prior applications you have.</p>
+  <a class="btn" href="/cases/new">New client</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

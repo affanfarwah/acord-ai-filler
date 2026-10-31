@@ -1,0 +1,43 @@
+Bluebonnet Care Transport LLC - NEMT Commercial Auto Questionnaire (DEMO, fictional data)
+Edit column C (Response) and column E (Status). Yellow = needed from client; orange = confirm.
+# | Question / Item | Response | Source | Status | Notes / What to ask client
+BUSINESS INFORMATION
+1 | Legal business name | Bluebonnet Care Transport LLC | Client email | Provided
+2 | DBA (if any) | Needed | Ask if they trade under another name
+3 | Business mailing address | 4820 Bluebonnet Ln, Austin, TX 78745 | Client email | Provided
+4 | Business phone number | (512) 555-0142 | Client email | Provided
+5 | Business email | office@bluebonnetcare.example | Client email | Provided
+6 | Website | www.bluebonnetcare.example | Client email | Provided
+7 | Federal Tax ID (FEIN) | 12-3456789 | W-9 | Provided
+8 | Entity type | LLC | Business name | Provided
+9 | Date operations started | 03/15/2019 | Client reply | Provided
+10 | Description of operations | Non-emergency medical transportation (NEMT) for Medicaid and private-pay riders in Travis County | Client reply | Provided
+11 | Annual revenue | Needed | Ask for last full year
+DRIVER INFORMATION
+12 | Driver 1 - Full name | Dana Whitfield | Client reply | Provided | Owner-operator
+13 | Driver 1 - Date of birth | 04/09/1984 | Client reply | Confirm | Read off a photo, confirm with client
+14 | Driver 1 - DL number | 12345678 | Client reply | Provided
+15 | Driver 1 - DL state | TX | Client reply | Provided
+16 | Driver 1 - Date of hire | 03/15/2019 | Client reply | Provided
+17 | Driver 1 - Years of driving experience | 14 | Client reply | Provided
+VEHICLE INFORMATION
+18 | Vehicle 1 - Year | 2022 | Registration | Provided
+19 | Vehicle 1 - Make | Toyota | Registration | Provided
+20 | Vehicle 1 - Model | Sienna | Registration | Provided
+21 | Vehicle 1 - VIN | DEMO0VIN000000001 | Registration | Provided | Fictional VIN
+22 | Vehicle 1 - Cost new | $38,500 | Bill of sale | Provided
+23 | Vehicle 1 - Seating capacity | 6 | Client reply | Provided
+24 | Radius of operation (miles) | 100 | Client reply | Provided
+INSURANCE HISTORY
+25 | Current auto carrier | Example Mutual Insurance Co | Dec page | Provided
+26 | Current policy number | EX-4471902 | Dec page | Provided
+27 | Current policy effective date | 12/01/2025 | Dec page | Provided
+28 | Current policy expiration date | 12/01/2026 | Dec page | Provided
+REQUESTED COVERAGE
+29 | Requested effective date | 12/01/2026 | Client reply | Provided
+30 | Bodily injury liability | $250,000 each person / $500,000 each accident | Client reply | Provided
+31 | Property damage liability | $100,000 each accident | Client reply | Provided
+32 | Uninsured / underinsured motorist | $100,000 each person / $300,000 each accident | Client reply | Provided
+33 | Medical payments | $5,000 per person | Client reply | Confirm | Client said 'about 5k', confirm
+34 | Comprehensive deductible | $500 | Client reply | Provided
+35 | Collision deductible | $1,000 | Client reply | Provided

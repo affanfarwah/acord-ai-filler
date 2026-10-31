@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ doc.filename }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block body %}
+<a class="back" href="/cases/{{ case.id }}?tab=sources">{{ case.name }}</a>
+<div class="pagehead">
+  <div>
+    <p class="eyebrow">Document</p>
+    <h1 class="display doc-title">{{ doc.filename }}</h1>
+    {% if hl_row %}<p class="muted">Row {{ hl_row }}{% if hl_sheet %} of {{ hl_sheet }}{% endif %} is highlighted: that's where the answer came from.</p>{% endif %}
+  </div>
+  <div class="actions"><a class="btn ghost" href="/cases/{{ case.id }}/docs/{{ doc.id }}/file">Download original</a></div>
+</div>
+{% if grid %}
+  {% for name, rows, ncols in grid %}
+  <section class="sheet sheetview">
+    <h2>{{ name }}</h2>
+    <div class="gridwrap">
+      <table class="grid">
+        <thead><tr><th></th>{% for i in range(ncols) %}<th>{{ "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i] if i < 26 else "A" ~ "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i - 26] }}</th>{% endfor %}</tr></thead>
+        <tbody>
+        {% for rno, vals in rows %}
+          <tr {% if rno == hl_row and (not hl_sheet or hl_sheet == name) %}class="hl-row" id="r{{ rno }}"{% endif %}><th>{{ rno }}</th>{% for v in vals %}<td>{{ v }}</td>{% endfor %}</tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endfor %}
+{% elif is_image %}
+  <img class="docimg" src="/cases/{{ case.id }}/docs/{{ doc.id }}/file" alt="{{ doc.filename }}">
+{% elif text is not none %}
+  <pre class="doctext">{{ text }}</pre>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script>
+// Show the cited row in the middle of its table, below the sticky page and column headers
+const hl = document.querySelector(".hl-row");
+if (hl) {
+  const wrap = hl.closest(".gridwrap");
+  hl.closest(".sheetview").scrollIntoView({ block: "start" });
+  wrap.scrollTop = hl.offsetTop - wrap.clientHeight / 2 + hl.offsetHeight / 2;
+}
+</script>{% endblock %}

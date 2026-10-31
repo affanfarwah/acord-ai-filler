@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Help{% endblock %}
+{% block body %}
+<div class="doc">
+  <p class="eyebrow">Help</p>
+  <h1 class="display">How ACORD AI Filler works</h1>
+  <p class="lede">Upload what the client sent you. ACORD AI Filler reads it once, fills every ACORD form you pick, and shows where each answer came from. You check the yellow ones and download.</p>
+
+  <ol class="steps">
+    <li><h2>Add a client</h2><p>Each client gets their own page. Type the business name, drop in the questionnaire, policies, declarations pages or prior ACORD forms, and pick the forms you need.</p></li>
+    <li><h2>ACORD AI Filler reads the documents</h2><p>It pulls out facts like the business address, drivers, vehicles and limits, and records the cell or page each one came from. Rows your questionnaire marks <em>Needed</em> are skipped.</p></li>
+    <li><h2>Review the yellow facts</h2><p>Anything ACORD AI Filler couldn't match to its source, or that the client still has to confirm, is highlighted. It stays out of the PDFs until you approve or correct it.</p></li>
+    <li><h2>Download the forms</h2><p>Get each form as a fillable PDF, all of them in a ZIP, or one combined read-only PDF.</p></li>
+  </ol>
+
+  <h2 id="statuses">What the colours mean</h2>
+  <dl class="defs">
+    <div><dt><span class="chip ok">Matches source</span></dt><dd>The answer was found in the exact cell or page it cites. Goes into the PDFs.</dd></div>
+    <div><dt><span class="chip hl">Check source</span></dt><dd>ACORD AI Filler couldn't confirm it against its source. Approve it or fix it.</dd></div>
+    <div><dt><span class="chip hl">Client to confirm</span></dt><dd>It came from a questionnaire row marked Confirm. Check with the client, then approve.</dd></div>
+    <div><dt><span class="chip ok">Approved</span> <span class="chip ok">Entered by you</span></dt><dd>You approved or typed it. Goes into the PDFs and is never overwritten when documents are read again.</dd></div>
+  </dl>
+
+  <h2>Words used here</h2>
+  <dl class="defs">
+    <div><dt>Agency</dt><dd>Your insurance office. Its name and address go in the producer section of every form. Set them once in Agency settings.</dd></div>
+    <div><dt>Client</dt><dd>One business you are getting insurance for: its documents, its forms and its answers.</dd></div>
+    <div><dt>Fact</dt><dd>One piece of client information, like the business name or a driver's license number. One fact fills every form that asks for it, so a fix in one place updates them all.</dd></div>
+  </dl>
+
+  <h2 id="forms">Supported forms</h2>
+  <p>ACORD 125 Commercial Insurance Application, 126 General Liability, 127 Business Auto, 130 Workers Compensation, 131 Umbrella / Excess, 137 Commercial Auto Coverages (Texas) and 140 Property. You can also import any fillable PDF your agency is licensed to use, in Agency settings.</p>
+</div>
+{% endblock %}

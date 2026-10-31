@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Agency settings{% endblock %}
+{% block body %}
+<div class="pagehead">
+  <div>
+    <p class="eyebrow">Agency settings</p>
+    <h1 class="display">{{ prod.get('Producer_FullName_A') or agency.name }}</h1>
+    <p class="muted">Fill this in once. It prints in the agency section of every form, for every client.</p>
+  </div>
+</div>
+{% if saved %}<p class="toast" role="status">Agency details saved. New downloads use them straight away.</p>{% endif %}
+
+<div class="settings">
+  <form method="post" action="/settings" id="agencyform" class="settings-form">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    {% for g in groups %}
+    <section class="sheet setgroup">
+      <header><h2>{{ g.title }}</h2><p class="muted small">{{ g.hint }}</p></header>
+      <div class="setgrid">
+        {% for f in g.rows %}
+        <label class="w-{{ f.size }}">
+          <span class="lbl">{{ f.label }}</span>
+          <input name="{{ f.key }}" value="{{ f.value }}" placeholder="{{ f.placeholder }}" autocomplete="{{ f.autocomplete }}"
+                 data-preview="{{ f.key }}" {% if f.size == 'quarter' and 'State' in f.key %}maxlength="2" class="upper"{% endif %}>
+          <small>Prints on {{ f.forms|join(', ') }}</small>
+        </label>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+    <div class="savebar" id="savebar" hidden>
+      <p>You have unsaved changes</p>
+      <button type="reset" class="btn ghost" id="discard">Discard</button>
+      <button class="btn">Save agency details</button>
+    </div>
+  </form>
+
+  <aside class="settings-side">
+    <p class="eyebrow">Preview</p>
+    <p class="muted small">How the agency box prints on ACORD 125.</p>
+    <div class="acordbox" aria-label="Preview of the agency box on ACORD 125">
+      <div class="ab-cell ab-agency">
+        <span class="ab-l">Agency</span>
+        <span class="ab-v" data-show="Producer_FullName_A"></span>
+        <span class="ab-v" data-show="Producer_MailingAddress_LineOne_A"></span>
+        <span class="ab-v" data-show="Producer_MailingAddress_LineTwo_A"></span>
+        <span class="ab-row"><span class="ab-v" data-show="Producer_MailingAddress_CityName_A"></span><span class="ab-v ab-st"><span data-show="Producer_MailingAddress_StateOrProvinceCode_A"></span> <span data-show="Producer_MailingAddress_PostalCode_A"></span></span></span>
+      </div>
+      <div class="ab-cell"><span class="ab-l">Contact name</span><span class="ab-v" data-show="Producer_ContactPerson_FullName_A"></span></div>
+      <div class="ab-split">
+        <div class="ab-cell"><span class="ab-l">Phone (A/C, No, Ext)</span><span class="ab-v" data-show="Producer_ContactPerson_PhoneNumber_A"></span></div>
+        <div class="ab-cell"><span class="ab-l">Fax (A/C, No)</span><span class="ab-v" data-show="Producer_FaxNumber_A"></span></div>
+      </div>
+      <div class="ab-cell"><span class="ab-l">E-mail address</span><span class="ab-v" data-show="Producer_ContactPerson_EmailAddress_A"></span></div>
+      <div class="ab-split">
+        <div class="ab-cell"><span class="ab-l">National producer number</span><span class="ab-v" data-show="Producer_NationalIdentifier_A"></span></div>
+        <div class="ab-cell"><span class="ab-l">State license no</span><span class="ab-v" data-show="Producer_StateLicenseIdentifier_A"></span></div>
+      </div>
+    </div>
+    <p class="complete" id="complete"></p>
+  </aside>
+</div>
+
+<div class="settings-more">
+  <section class="sheet">
+    <header><h2>Your own forms</h2><p class="muted small">Import a fillable PDF your agency is licensed to use. It appears in the form list for new clients.</p></header>
+    {% if custom %}<ul class="doclist">{% for t in custom %}<li><span class="docname">{{ t.title }}</span></li>{% endfor %}</ul>{% endif %}
+    <form method="post" action="/templates/import" enctype="multipart/form-data" class="importform">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label><span class="lbl">Form name</span><input name="title" required placeholder="ACORD 163 Driver schedule"></label>
+      <label class="drop small-drop"><input type="file" name="file" accept=".pdf" required><span class="drop-title">Choose a fillable PDF</span></label>
+      <button class="btn ghost">Import form</button>
+    </form>
+  </section>
+  {% if auth_on %}
+  <section class="sheet">
+    <header><h2>Team</h2><p class="muted small">Share this code with colleagues. They enter it when they create an account to join your agency.</p></header>
+    <p class="invite"><code>{{ agency.invite_code }}</code></p>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/settings.js?v={{ v }}"></script>{% endblock %}
