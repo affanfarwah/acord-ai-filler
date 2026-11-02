@@ -35,6 +35,12 @@ Tests: `.venv/bin/python -m pytest -q tests`
 - **Excel rules in code**: rows with Status = Needed are never sent to the AI; Confirm rows are tagged.
 - Producer details come from Agency settings. Insurer, signature and form-date fields are left to the agent.
 
+## Deploy
+
+Railway, one service with a volume at `/data`. See [`ops/RAILWAY.md`](ops/RAILWAY.md). While one
+agency uses it, sign-in is a single shared login set by `ACORD_LOGIN_EMAIL` / `ACORD_LOGIN_PASSWORD`
+and public sign-up is off (`ACORD_SIGNUP`).
+
 ## Before launch
 
 - ACORD form licensing for a hosted multi-agency product (the bundled PDFs are third-party copies).

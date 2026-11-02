@@ -11,8 +11,9 @@ ROOT = Path(__file__).resolve().parent.parent
 XLSX = ROOT / "tests" / "fixtures" / "questionnaire.xlsx"  # fictional client, same layout as a real questionnaire
 
 
-def make_client(tmp_path, monkeypatch, auth="off"):
+def make_client(tmp_path, monkeypatch, auth="off", signup="on"):
     monkeypatch.setenv("ACORD_DATA", str(tmp_path))
+    monkeypatch.setenv("ACORD_SIGNUP", signup)
     monkeypatch.setenv("ACORD_AI", "fake")
     monkeypatch.setenv("ACORD_AUTH", auth)
     monkeypatch.setenv("ACORD_SYNC_JOBS", "1")
@@ -158,6 +159,23 @@ def test_auth_and_tenant_isolation(tmp_path, monkeypatch):
     r = c2.post(f"/cases/{cid}/facts", json={"edits": {"NamedInsured_FullName_A": "x"}, "csrf": csrf(c2)})
     assert r.status_code == 403
     assert "password don" in c2.post("/login", data={"email": "a@x.com", "password": "wrongpass1", "csrf": csrf(c2)}).text
+
+
+def test_shared_agency_login(tmp_path, monkeypatch):
+    """Hosted for one agency: one login from env vars, no public sign-up, password changes on redeploy."""
+    monkeypatch.setenv("ACORD_LOGIN_EMAIL", "Office@Agency.com")
+    monkeypatch.setenv("ACORD_LOGIN_PASSWORD", "correct horse 1")
+    monkeypatch.setenv("ACORD_AGENCY_NAME", "Test Agency")
+    c, app = make_client(tmp_path, monkeypatch, auth="on", signup="off")
+    assert c.get("/healthz").json() == {"ok": True}
+    assert "Create an account" not in c.get("/login").text
+    assert c.post("/register", data={"name": "X", "email": "x@x.com", "password": "password1", "agency": "X", "csrf": csrf(c)}).status_code == 404
+    r = c.post("/login", data={"email": "office@agency.com", "password": "correct horse 1", "csrf": csrf(c)}, follow_redirects=False)
+    assert r.status_code == 303 and c.get("/").status_code == 200 and "Test Agency" in c.get("/").text
+    monkeypatch.setenv("ACORD_LOGIN_PASSWORD", "a new password 2")
+    c2, _ = make_client(tmp_path, monkeypatch, auth="on", signup="off")
+    assert "password don" in c2.post("/login", data={"email": "office@agency.com", "password": "correct horse 1", "csrf": csrf(c2)}).text
+    assert c2.post("/login", data={"email": "office@agency.com", "password": "a new password 2", "csrf": csrf(c2)}, follow_redirects=False).status_code == 303
 
 
 def test_citation_formats_and_duplicate_instances(env):

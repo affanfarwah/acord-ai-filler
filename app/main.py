@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import List
 
 import fitz
-from fastapi import FastAPI, File, Form, Query, Request, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -39,6 +39,7 @@ def _secret():
 
 
 AUTH_ON = os.environ.get("ACORD_AUTH", "off").lower() == "on"  # off during development; on before launch
+SIGNUP_ON = os.environ.get("ACORD_SIGNUP", "off").lower() == "on"  # self-service agency sign-up; off while one agency uses the app
 app.add_middleware(SessionMiddleware, secret_key=_secret(), same_site="lax", max_age=60 * 60 * 12,
                    https_only=os.environ.get("ACORD_HTTPS", "off") == "on")  # set on when hosted behind HTTPS
 app.mount("/static", StaticFiles(directory=str(db.BASE / "app" / "static")), name="static")
@@ -118,6 +119,31 @@ def _dev_user():
         return dict(r)
 
 
+def _shared_login():
+    """The agency's one login, from ACORD_LOGIN_EMAIL / ACORD_LOGIN_PASSWORD (set in Railway, shared by its staff).
+    Created on first start; changing the password variable and redeploying changes the password."""
+    email = os.environ.get("ACORD_LOGIN_EMAIL", "").strip().lower()
+    pw = os.environ.get("ACORD_LOGIN_PASSWORD", "")
+    if not email or not pw:
+        return
+    if len(pw) < 12:
+        raise RuntimeError("ACORD_LOGIN_PASSWORD must be at least 12 characters")
+    with db.conn() as c:
+        r = c.execute("SELECT id, pw_hash FROM users WHERE email=?", (email,)).fetchone()
+        if r:
+            if not check_pw(pw, r["pw_hash"]):
+                c.execute("UPDATE users SET pw_hash=? WHERE id=?", (hash_pw(pw), r["id"]))
+            return
+        aid = c.execute("INSERT INTO agencies (name, invite_code) VALUES (?,?)",
+                        (os.environ.get("ACORD_AGENCY_NAME", "My Agency").strip(), secrets.token_urlsafe(8))).lastrowid
+        c.execute("INSERT INTO users (agency_id, name, email, pw_hash, is_admin) VALUES (?,?,?,?,1)",
+                  (aid, "Agency login", email, hash_pw(pw)))
+
+
+if AUTH_ON:
+    _shared_login()
+
+
 def current_user(request):
     if not AUTH_ON:
         return _dev_user()
@@ -152,8 +178,16 @@ def page(request, name, **ctx):
     u = current_user(request)
     ctx.setdefault("agency_name", _agency_name(u))
     ctx.update(user=u, csrf=csrf_token(request), ai_ready=ai.is_ready(),
-               auth_on=AUTH_ON, status_label=STATUS_LABEL, v=ASSET_V)
+               auth_on=AUTH_ON, signup_on=SIGNUP_ON, status_label=STATUS_LABEL, v=ASSET_V)
     return tpl.TemplateResponse(request, name, ctx)
+
+
+@app.get("/healthz")
+def healthz():
+    """Railway's health check: the app is up and the database answers."""
+    with db.conn() as c:
+        c.execute("SELECT 1")
+    return {"ok": True}
 
 
 @app.get("/login", response_class=HTMLResponse)
@@ -180,6 +214,8 @@ def login(request: Request, email: str = Form(...), password: str = Form(...), c
 @app.post("/register")
 def register(request: Request, name: str = Form(...), email: str = Form(...), password: str = Form(...),
              agency: str = Form(""), invite: str = Form(""), csrf: str = Form("")):
+    if not SIGNUP_ON:
+        raise HTTPException(404)
     if not csrf_ok(request, csrf):
         return page(request, "login.html", error="Your session expired. Try again.")
     email = email.strip().lower()

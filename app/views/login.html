@@ -23,6 +23,7 @@
         <button class="btn">Sign in</button>
       </form>
     </section>
+    {% if signup_on %}
     <details class="sheet">
       <summary><h2>Create an account</h2></summary>
       <form method="post" action="/register">
@@ -35,6 +36,7 @@
         <button class="btn">Create account</button>
       </form>
     </details>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

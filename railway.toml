@@ -1,0 +1,14 @@
+# Railway builds from the Dockerfile rather than guessing the stack, the same as Deal Analyzer.
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# /healthz also opens the database, so a missing or read-only volume fails the deploy here
+# instead of on the first agent's upload.
+healthcheckPath = "/healthz"
+healthcheckTimeout = 60
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+# Exactly one instance: SQLite and the background AI jobs belong to one process.
+numReplicas = 1
